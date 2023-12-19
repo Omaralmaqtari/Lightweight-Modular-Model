@@ -18,7 +18,7 @@ import torchvision
 from torch import optim
 import torch.nn.functional as F
 
-from LEE_Net import LEE_Net 
+from LM_Net import LM_Net 
 from DeepCrack import define_deepcrack
 from HED import HED, get_vgg_weights 
 from RCF import RCF
@@ -37,24 +37,24 @@ class Solver(object):
         # Config
         self.cfg = config
         
-		# Data loader
+	# Data loader
         self.mode = config.mode
         self.train_loader = train_loader
         self.valid_loader = valid_loader
         self.test_loader = test_loader
         
-		# Hyper-parameters
+	# Hyper-parameters
         self.lr = config.lr
         self.beta1 = config.beta1
         self.beta2 = config.beta2
         self.loss_weight = torch.Tensor([config.loss_weight])
-
-		# Training settings
+	
+	# Training settings
         self.num_epochs = config.num_epochs
         self.batch_size = config.batch_size
         self.num_epochs_decay = config.num_epochs_decay
         
-		# Path
+	# Path
         self.model_path = config.model_path
         self.result_path = config.result_path
         self.SR_path = config.SR_path
@@ -84,9 +84,9 @@ class Solver(object):
     def build_model(self):
         print("initialize model...")
 
-        # LEE-Net
-        if self.net_type =='LEE_Net':
-            self.model = LEE_Net(self.img_ch,self.output_ch)
+        # LM-Net
+        if self.net_type =='LM_Net':
+            self.model = LM_Net(self.img_ch,self.output_ch)
         
         # HED
         elif self.net_type == 'HED':
@@ -179,10 +179,10 @@ class Solver(object):
             self.lr_scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer, step_size=3, gamma=0.1)
         
         # Optimizer
-        if  self.net_type == 'LEE_Net' or self.net_type == 'Shufflenetv2' or self.net_type == 'Mobilenetv3' or self.net_type == 'Efficientnet' or self.net_type == 'DeepCrack' or self.net_type == 'HED':
+        if  self.net_type == 'LM_Net' or self.net_type == 'Shufflenetv2' or self.net_type == 'Mobilenetv3' or self.net_type == 'Efficientnet' or self.net_type == 'DeepCrack' or self.net_type == 'HED':
             self.optimizer = optim.Adam(self.model.parameters(),self.lr, [self.beta1, self.beta2], weight_decay=2e-4)
             
-        if  self.net_type == 'LEE_Net' or self.net_type == 'Shufflenetv2' or self.net_type == 'Mobilenetv3' or self.net_type == 'Efficientnet' or self.net_type == 'DeepCrack' or self.net_type == 'HED':
+        if  self.net_type == 'LM_Net' or self.net_type == 'Shufflenetv2' or self.net_type == 'Mobilenetv3' or self.net_type == 'Efficientnet' or self.net_type == 'DeepCrack' or self.net_type == 'HED':
             self.lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, 'min', factor=0.8, patience=self.num_epochs_decay, verbose=True)
         
         
@@ -212,7 +212,7 @@ class Solver(object):
 
 		#====================================== Training ===========================================#
 		#===========================================================================================#
-        factor = 1
+        factor = 0.8
         elapsed = 0.# Time of inference
         t = time.time()
         
@@ -249,10 +249,10 @@ class Solver(object):
                 RC = 0.		# Recall (Sensitivity)
                 PC = 0. 	# Precision
                 F1 = 0.		# F1 Score
-                IoU = 0     # Intersection over Union (Jaccard Index)
+                IoU = 0     	# Intersection over Union (Jaccard Index)
                 mIoU = 0.	# mean of Intersection over Union (mIoU)
-                OIS = 0.    # 
-                AIU = 0.    #
+                OIS = 0.    	# 
+                AIU = 0.    	#
                 DC = 0.		# Dice Coefficient
                 length = 0
                 
@@ -267,8 +267,8 @@ class Solver(object):
                     GT = GT.to(self.device)
                     
                     
-                    # LEE-Net, Shufflenetv2, Mobilenetv3, Efficientnet
-                    if self.net_type == 'LEE_Net' or self.net_type == 'Shufflenetv2' or self.net_type == 'Mobilenetv3' or self.net_type == 'Efficientnet':
+                    # LM-Net, Shufflenetv2, Mobilenetv3, Efficientnet
+                    if self.net_type == 'LM_Net' or self.net_type == 'Shufflenetv2' or self.net_type == 'Mobilenetv3' or self.net_type == 'Efficientnet':
                         SR = self.model(image)
                         SR_f = SR.view(-1)
                         GT_f = GT.view(-1)
@@ -356,7 +356,7 @@ class Solver(object):
                 twr.writerow([epoch+1, Acc, RC, PC, F1, IoU, mIoU, OIS, AIU, DC])
                 
 				
-				# Clear unoccupied GPU memory after each epoch
+		# Clear unoccupied GPU memory after each epoch
                 torch.cuda.empty_cache()
                 
 				#===================================== Validation ====================================#
@@ -368,10 +368,10 @@ class Solver(object):
                 RC = 0.		# Recall (Sensitivity)
                 PC = 0. 	# Precision
                 F1 = 0.		# F1 Score
-                IoU = 0     # Intersection over Union (Jaccard Index)
+                IoU = 0     	# Intersection over Union (Jaccard Index)
                 mIoU = 0.	# mean of Intersection over Union (mIoU)
-                OIS = 0.    # 
-                AIU = 0.    #
+                OIS = 0.    	# 
+                AIU = 0.    	#
                 DC = 0.		# Dice Coefficient
                 length = 0
                 
@@ -383,8 +383,8 @@ class Solver(object):
                     GT = GT.to(self.device)
                     
                     with torch.no_grad():
-                        # LEE-Net, Shufflenetv2, Mobilenetv3, Efficientnet
-                        if self.net_type == 'LEE_Net' or self.net_type == 'Shufflenetv2' or self.net_type == 'Mobilenetv3' or self.net_type == 'Efficientnet':
+                        # LM-Net, Shufflenetv2, Mobilenetv3, Efficientnet
+                        if self.net_type == 'LM_Net' or self.net_type == 'Shufflenetv2' or self.net_type == 'Mobilenetv3' or self.net_type == 'Efficientnet':
                             SR = self.model(image)
                             SR_f = SR.view(-1)
                             GT_f = GT.view(-1)
@@ -509,13 +509,13 @@ class Solver(object):
         RC = 0.		# Recall (Sensitivity)
         PC = 0. 	# Precision
         F1 = 0.		# F1 Score
-        IoU = 0     # Intersection over Union (Jaccard Index)
+        IoU = 0     	# Intersection over Union (Jaccard Index)
         mIoU = 0.	# mean of Intersection over Union (mIoU)
-        OIS = 0.    # 
-        AIU = 0.    #
+        OIS = 0.    	# 
+        AIU = 0.    	#
         DC = 0.		# Dice Coefficient
         length = 0
-        elapsed = 0.# Time of inference
+        elapsed = 0.	# Time of inference
         threshold = 0
         RC_curve = 0.
         PC_curve = 0.
@@ -535,9 +535,9 @@ class Solver(object):
             
             
             with torch.no_grad():
-                # LEE-Net, Shufflenetv2, Mobilenetv3, Efficientnet
-                if self.net_type == 'LEE_Net' or self.net_type == 'Shufflenetv2' or self.net_type == 'Mobilenetv3' or self.net_type == 'Efficientnet':
-                    SR = self.model(image)#, FM1, FM2, FM3, FM4
+                # LM-Net, Shufflenetv2, Mobilenetv3, Efficientnet
+                if self.net_type == 'LM_Net' or self.net_type == 'Shufflenetv2' or self.net_type == 'Mobilenetv3' or self.net_type == 'Efficientnet':
+                    SR = self.model(image)
                 # RCF
                 elif self.net_type == 'RCF':
                     outputs = self.model(image)
@@ -570,40 +570,6 @@ class Solver(object):
             DC += get_DC(SR_f,GT_f)[1]
             length += 1
             
-            '''
-            img = plt.figure(frameon=False)
-            ax = plt.Axes(img, [0., 0., 1., 1.])
-            ax.set_axis_off()
-            img.add_axes(ax)
-            plt.imshow(image[0,:,:,:].permute(1,2,0).cpu().numpy())
-            img.savefig(self.SR_path+name[0], bbox_inches='tight',transparent=True, pad_inches=0)
-            '''
-            '''
-            if get_mIoU(SR_f,GT_f)[5] > 0.1:
-                SR[SR < 0.0] = 0
-                SR[SR > 0.0] = 1
-                img = plt.figure(frameon=False)
-                ax = plt.Axes(img, [0., 0., 1., 1.])
-                ax.set_axis_off()
-                img.add_axes(ax)
-                plt.imshow(SR[0,0,:,:].detach().cpu().numpy(), cmap='gray')
-                img.savefig(self.SR_path+name[0], dpi=300, bbox_inches='tight',transparent=True, pad_inches=0)
-            '''
-            '''
-            names = ['I1_3conv', 'I1_maxpool', 'I1_EEM', 'I2_3conv', 'I2_maxpool', 'I2_EEM', 'I3_3conv', 'I3_maxpool', 'I3_EEM', 'I5_3conv', 'I5_maxpool', 'I5_EEM']
-            output = [FM1[0], FM1[1], FM1[2], FM2[0], FM2[1], FM2[2], FM3[0], FM3[1], FM3[2], FM4[0], FM4[1], FM4[2]]
-            for n, out in zip(names, output):
-                dimensi_iter = out[0,:,:,:]
-                print(dimensi_iter.shape)
-                for j in range(len(dimensi_iter)):
-                    print('saving activtion map %s'%(j+1))
-                    img = plt.figure(frameon=False)
-                    ax = plt.Axes(img, [0., 0., 1., 1.])
-                    ax.set_axis_off()
-                    img.add_axes(ax)
-                    ax.imshow(dimensi_iter[j].detach().cpu().numpy(), cmap='gray')
-                    img.savefig(self.SR_path+n+'_%s.png'%(j+1), dpi=150, bbox_inches='tight',transparent=True, pad_inches=0)
-            '''
         Acc = Acc/length
         RC = RC/length
         PC = PC/length
@@ -623,8 +589,8 @@ class Solver(object):
         
         f = open(os.path.join(self.result_path,'Test_result.csv'), 'a', encoding='utf-8', newline='')
         wr = csv.writer(f)
-        wr.writerow(['Report_file','Model_type','Dataset','Acc','RC','PC','F1','IoU','mIoU','OIS','AIU','DC','Model_score','Time of Inference','Threshold','LR','Epochs','Augmentation Prob'])
-        wr.writerow([self.model_name,self.net_type,self.dataset,Acc,RC,PC,F1,IoU,mIoU,OIS,AIU,DC,model_score,elapsed,threshold,self.lr,self.num_epochs,self.augmentation_prob])
+        wr.writerow(['Report_file', 'Model_type', 'Dataset', 'Acc', 'RC', 'PC', 'F1', 'IoU', 'mIoU', 'OIS', 'AIU', 'DC', 'Model_score', 'Time of Inference', 'LR', 'Epochs', 'Augmentation Prob'])
+        wr.writerow([self.model_name, self.net_type, self.dataset, Acc, RC, PC, F1, IoU, mIoU, OIS, AIU, DC, model_score, elapsed, self.lr, self.num_epochs, self.augmentation_prob])
         f.close()
         
         print('Results have been Saved')
