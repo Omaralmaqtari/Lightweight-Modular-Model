@@ -5,7 +5,7 @@ Created on Fri Mar 17 01:04:24 2023
 @author: Omar Al-maqtari
 """
 
-## LM-Net
+## LM_Net
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -206,9 +206,9 @@ class PDAM(nn.Module):
         return self.conv4(x0+x1+x2+x3)
     
 
-class LEE_Net(nn.Module):
+class LM_Net(nn.Module):
     def __init__(self, img_ch=3, output_ch=1):
-        super(LEE_Net, self).__init__()
+        super(LM_Net, self).__init__()
         self.prelayer = nn.Conv2d(img_ch,96,kernel_size=3,padding=1,bias=False)
         self.sem1 = SEM(96, reduction=24)
         
