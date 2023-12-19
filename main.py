@@ -16,8 +16,8 @@ import torch
 
 def main(config):
     cudnn.benchmark = True
-    if config.net_type not in ['LEE_Net','DeepCrack','HED','RCF','Shufflenetv2','Mobilenetv3','Efficientnet']:
-        print('ERROR!! net_type should be selected in LEE_Net/Shufflenetv2/Mobilenetv3/Efficientnet/DeepCrack/HED/RCF')
+    if config.net_type not in ['LM_Net','DeepCrack','HED','RCF','Shufflenetv2','Mobilenetv3','Efficientnet']:
+        print('ERROR!! net_type should be selected in LM_Net/Shufflenetv2/Mobilenetv3/Efficientnet/DeepCrack/HED/RCF')
         print('Your input for net_type was %s'%config.net_type)
         return
 
@@ -84,10 +84,10 @@ if __name__ == '__main__':
     parser.add_argument('--augmentation_prob', type=float, default=0.094)#Crack500=0.094, Deepcrack=0.1, GAPs384=0.25
 
     # misc
-    parser.add_argument('--mode', type=str, default='test')
-    parser.add_argument('--model_name', type=str, default='Segmentation Training LEE_Net 12 C')
+    parser.add_argument('--mode', type=str, default='train')
+    parser.add_argument('--model_name', type=str, default='Segmentation Training LM_Net C')
     parser.add_argument('--dataset', type=str, default='Crack500', help='Crack500/DeepCrack/GAPs384')
-    parser.add_argument('--net_type', type=str, default='LEE_Net', help='LEE_Net/DeepCrack/HED/RCF/Shufflenetv2/Mobilenetv3/Efficientnet')
+    parser.add_argument('--net_type', type=str, default='LM_Net', help='LM_Net/DeepCrack/HED/RCF/Shufflenetv2/Mobilenetv3/Efficientnet')
     parser.add_argument('--model_path', type=str, default='D:/Educational/PhD-SWJTU/Research/Codes/Segmentation/Lightweight Edge Extraction Network/models/')
     parser.add_argument('--result_path', type=str, default='D:/Educational/PhD-SWJTU/Research/Codes/Segmentation/Lightweight Edge Extraction Network/results/')
     parser.add_argument('--SR_path', type=str, default='D:/Educational/PhD-SWJTU/Research/Codes/Datasets/Segmentation datasets/Crack500/Cropped dataset1/SR/')
