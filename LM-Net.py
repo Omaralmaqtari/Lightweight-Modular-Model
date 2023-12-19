@@ -5,14 +5,12 @@ Created on Fri Mar 17 01:04:24 2023
 @author: Omar Al-maqtari
 """
 
-## LEE_Net 
+## LM-Net
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 from scipy.ndimage import gaussian_filter, laplace
-import sys
-sys.path.insert(0, 'D:/Educational/PhD-SWJTU/Research/Codes/Feature Extraction algorithms')
 from FRCM import FRCM
 
 def gaussiankernel(ch_out, ch_in, kernelsize, sigma, kernelvalue):
@@ -30,17 +28,6 @@ def laplaceiankernel(ch_out, ch_in, kernelsize, kernelvalue):
     laplacekernel = torch.from_numpy(l)
     
     return laplacekernel.float()
-
-
-def Channel_Shuffle(x, groups):
-    n, c, h, w = x.size()
-
-    channels_per_group = c // groups
-    x = x.view(n, groups, channels_per_group, h, w)
-    x = torch.transpose(x, 1, 2).contiguous()
-    x = x.view(n, -1, h, w)
-
-    return x
 
 
 class SEM(nn.Module):
@@ -80,11 +67,9 @@ class EEM(nn.Module):
             nn.InstanceNorm2d(int(ch_out/2))
             )
         self.conv3 = nn.Sequential(
+            nn.MaxPool2d(3, stride=1, padding=1),
             nn.Conv2d(int(ch_out/2), ch_out, kernel_size=1,padding=0,groups=2),
             nn.PReLU(num_parameters=ch_out, init=0.01),
-            nn.GroupNorm(4, ch_out),
-            nn.MaxPool2d(3, stride=1, padding=1),
-            nn.Conv2d(ch_out, ch_out, kernel_size=1,padding=0,groups=4),
             nn.GroupNorm(4, ch_out)
             )
             
@@ -97,7 +82,7 @@ class EEM(nn.Module):
         LoG = F.conv2d(DoG, self.lk, padding='same',groups=self.groups)
         DoG = self.conv1(DoG-x)
         LoG = self.conv2(LoG)
-        tot = self.conv3(DoG+LoG)
+        tot = self.conv3(DoG*LoG)
         
         tot1 = self.sem1(tot)
         x1 = self.sem2(x)
@@ -160,7 +145,7 @@ class PFM(nn.Module):
             x = self.shortcut(x)
         y3 = self.sem2(x)
         
-        return Channel_Shuffle(self.prelu(x+y1+y2+y3), 2)#, b1, b3, eem, b2
+        return self.prelu(x+y1+y2+y3)
 
 
 class PDAM(nn.Module):
@@ -287,13 +272,13 @@ class LEE_Net(nn.Module):
         x = x1+x2
         
         # encoding path
-        i1 = self.PFM1(x)#, b11, b13, b1e, b12
-        i2 = self.PFM2(i1)#, b21, b23, b2e, b22
+        i1 = self.PFM1(x)
+        i2 = self.PFM2(i1)
         x = self.dropout1(self.Max_Pooling(i2))
         
-        i3 = self.PFM3(x, True)#, b31, b33, b3e, b32
+        i3 = self.PFM3(x, True)
         i4 = self.PFM4(i3)
-        i5 = self.PFM5(i4)#, b51, b53, b5e, b52
+        i5 = self.PFM5(i4)
         x = self.dropout2(self.Max_Pooling(i5))
 
         i6 = self.PFM6(x, True)
@@ -328,5 +313,5 @@ class LEE_Net(nn.Module):
         
         x1 = self.sem3(x)
 
-        return self.out(x+x1)#, [b11, b13, b1e], [b21, b23, b2e], [b31, b33, b3e], [b51, b53, b5e]
+        return self.out(x+x1)
 
