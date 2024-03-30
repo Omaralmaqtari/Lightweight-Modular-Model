@@ -134,10 +134,10 @@ def imageCrop(img_file, save_path, num_crops, mode, PoC):
 parser = argparse.ArgumentParser()
 parser.add_argument('--img_path', type=str, default='D:/Educational/PhD-SWJTU/Research/Codes/Datasets/Segmentation datasets/Crack500/Cropped dataset/')
 parser.add_argument('--save_path', type=str, default='D:/Educational/PhD-SWJTU/Research/Codes/Datasets/Segmentation datasets/Crack500/Cropped dataset/')
-parser.add_argument('--dataset', type=str, default='Crack500', help='Crack500/DeepCrack/GAPs 10m/GAPs384')
+parser.add_argument('--dataset', type=str, default='Crack500', help='Crack500/DeepCrack/GAPs10m/GAPs384/AigleRN-TRIMM')
 parser.add_argument('--num_crops', type=int, default=9, help='any number of cracks is supported, but needs to specify the base number')
 parser.add_argument('--mode', type=str, default='train', help='train, valid, test')
-parser.add_argument('--PoC', type=int, default=0.0603, help='Percentage of Crack')
+parser.add_argument('--PoC', type=int, default=0.0603, help='Percentage of Crack(0.0603/0.0358/0.0121/0.015)')
 
 args = parser.parse_args()
 
