@@ -37,24 +37,24 @@ class Solver(object):
         # Config
         self.cfg = config
         
-	# Data loader
+        # Data loader
         self.mode = config.mode
         self.train_loader = train_loader
         self.valid_loader = valid_loader
         self.test_loader = test_loader
         
-	# Hyper-parameters
+        # Hyper-parameters
         self.lr = config.lr
         self.beta1 = config.beta1
         self.beta2 = config.beta2
         self.loss_weight = torch.Tensor([config.loss_weight])
 	
-	# Training settings
+        # Training settings
         self.num_epochs = config.num_epochs
         self.batch_size = config.batch_size
         self.num_epochs_decay = config.num_epochs_decay
         
-	# Path
+        # Path
         self.model_path = config.model_path
         self.result_path = config.result_path
         self.SR_path = config.SR_path
@@ -204,8 +204,6 @@ class Solver(object):
         
 
     def train(self):
-        """Train encoder, generator and discriminator."""
-
 		#====================================== Training ===========================================#
 		#===========================================================================================#
         factor = 0.8
@@ -490,7 +488,6 @@ class Solver(object):
         
         # Load Trained Model
         if os.path.isfile(self.model_file):
-			# Load the pretrained Encoder
             self.model = torch.load(self.model_file)
             print('%s is Successfully Loaded from %s'%(self.net_type,self.model_file))
         else: 
