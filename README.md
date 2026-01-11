@@ -23,4 +23,4 @@ The model was trained and tested on five datasets "Crack500, DeepCrack, GAPs384,
 6. matplotlib 3.8.0
 
 ## Cite this article
-O. Al-maqtari, B. Peng, Z. Al-Huda, A. Al-Malahi and N. Maqtary, "Lightweight Yet Effective: A Modular Approach to Crack Segmentation," in IEEE Transactions on Intelligent Vehicles, doi: 10.1109/TIV.2024.3405495.
+O. Al-maqtari, B. Peng, Z. Al-Huda, A. Al-Malahi and N. Maqtary, "Lightweight Yet Effective: A Modular Approach to Crack Segmentation," in IEEE Transactions on Intelligent Vehicles, https://doi.org/10.1109/TIV.2024.3405495.
